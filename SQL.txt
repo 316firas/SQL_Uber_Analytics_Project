@@ -1,0 +1,88 @@
+
+1, How many unique customers use each payment method?
+
+SELECT
+    payment_method,
+    COUNT(DISTINCT customer_id) AS No_of_Customers
+FROM ncr_ride_bookings
+GROUP BY payment_method
+ORDER BY No_of_Customers DESC;
+
+2, Customer distribution by vehicle type
+
+SELECT
+    vehicle_type,
+    COUNT(DISTINCT customer_id) AS No_of_customers
+FROM ride_bookings
+GROUP BY vehicle_type
+ORDER BY No_of_customers DESC;
+
+3, How many cancellations are initiated by customers vs drivers for each vehicle type?
+
+SELECT
+    vehicle_type,
+    SUM(cancelled_rides_by_customer) AS customer_cancelled,
+    SUM(cancelled_rides_by_driver) AS driver_cancelled
+FROM ride_bookings
+GROUP BY vehicle_type
+ORDER BY vehicle_type desc;
+
+
+
+4, What is the total number of customer-initiated vs driver-initiated cancellations across all rides?
+
+
+SELECT
+    SUM(cancelled_rides_by_customer) AS customer_cancelled,
+    SUM(cancelled_rides_by_driver) AS driver_cancelled
+FROM ride_bookings;
+
+5, What is the average booking value by vehicle type?
+
+SELECT
+    vehicle_type,
+    ROUND(AVG(booking_value), 2) AS avg_booking_value
+FROM ride_bookings
+WHERE booking_status = 'Completed'
+GROUP BY vehicle_type
+ORDER BY avg_booking_value DESC;
+
+
+6, What is the distribution of booking outcomes across the platform?
+
+SELECT
+    booking_status,
+    COUNT(*) AS total_bookings,
+    ROUND(
+        COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (),
+        0
+    ) AS percentage_share
+FROM ride_bookings
+GROUP BY booking_status
+ORDER BY total_bookings DESC;
+
+
+7, Revenue Distribution by Payment Method for Completed Rides
+
+ SELECT 
+    payment_method,
+    SUM(booking_value) AS total_revenue,
+    ROUND(SUM(booking_value) / 
+          (SELECT SUM(booking_value) 
+           FROM ride_bookings 
+           WHERE booking_status = 'completed') * 100, 2) AS revenue_percentage
+FROM ride_bookings
+WHERE booking_status = 'completed'
+GROUP BY payment_method
+ORDER BY total_revenue DESC;
+
+
+
+
+
+
+
+
+
+
+
